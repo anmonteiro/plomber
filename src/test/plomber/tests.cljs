@@ -3,7 +3,6 @@
             [plomber.core :as plomber]))
 
 (deftest test-generate-stats
-  (is false)
   (is (= (plomber/generate-stats
            {:measurements {"Dashboard" {:will-mount 1761.62 :did-mount 1781.78 :mount-ts [20.16]}
                            "Post"      {:will-mount 1771.28 :did-mount 1777.94 :mount-ts [6.66]}}
