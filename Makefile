@@ -3,7 +3,7 @@ test:
 	npm set progress=false
   # stupid react-dom asking for react
 	npm install react
-	lein with-profile -dev,+test run -m clojure.main scripts/test-runner.clj
+	lein with-profile -dev,+test doo node test once
 	node target/test/test.js
 
 clean:

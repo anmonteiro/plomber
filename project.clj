@@ -9,7 +9,16 @@
                  [devcards-om-next "0.1.1" :scope "test"]]
 
   :profiles {:dev {:dependencies [[org.omcljs/om "1.0.0-alpha35-SNAPSHOT" :scope "provided"]]}
-             :test {:dependencies [[org.omcljs/om "1.0.0-alpha35"]]}}
+             :test {:dependencies [[org.omcljs/om "1.0.0-alpha35"]]
+                    :plugins [[lein-doo "0.1.6"]
+                              [lein-cljsbuild "1.1.3"]]
+                    :cljsbuild {:builds [{:id           "test"
+                                          :source-paths ["src/main" "src/test"]
+                                          :compiler     {:output-to "target/js/client_test.js"
+                                                         :output-dir "target/js/out"
+                                                         :main          plomber.runner
+                                                         :target :nodejs
+                                                         :optimizations :none}}]}}}
 
   :source-paths ["src/main" "src/devcards" "src/test"]
   :clean-targets ^{:protect false} [:target-path
