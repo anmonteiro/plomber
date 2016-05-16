@@ -1,0 +1,117 @@
+@keyframes in-fade-top-soft {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, -4rem, 0);
+  }
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+@-webkit-keyframes in-fade-top-soft {
+  0% {
+    opacity: 0;
+    -webkit-transform: translate3d(0, -4rem, 0);
+  }
+  100% {
+    opacity: 1;
+    -webkit-transform: none;
+  }
+}
+.plomber {
+  user-select: none;
+  -moz-user-select: none;
+  -webkit-user-select: none;
+  pointer-events: none;
+  color: #888888;
+  position: fixed;
+  z-index: 1000;
+  top: 0;
+  left: 0;
+  width: 100%;
+}
+.plomber > figure {
+  margin: 0;
+}
+.instrumentation-table {
+  -webkit-animation: in-fade-top-soft 500ms;
+  animation: in-fade-top-soft 500ms;
+  background-color: rgba(0, 0, 0, 0.6);
+  font-family: Monaco, monospace;
+  font-size: .75rem;
+  line-height: 2;
+  width: 100%;
+  border-collapse: collapse;
+}
+.instrumentation-table thead,
+.instrumentation-table tr {
+  border-color: none;
+}
+.instrumentation-table th {
+  color: #ffffff;
+  line-height: 1rem;
+  padding: 0.6rem 0;
+/*  text-transform: uppercase;*/
+  text-align: left;
+  border-bottom: 2px solid rgb(127,127,127);
+}
+.instrumentation-table tr:not(:first-child) th {
+  pointer-events: auto;
+  cursor: pointer;
+  padding: 0.8rem 0;
+}
+.instrumentation-table tr:not(:first-child) th:hover span {
+  background-color: rgb(127,127,127);
+  padding: 5px;
+  border-radius: 5px;
+}
+.instrumentation-table tr:not(:first-child) th:first-child,
+.instrumentation-table thead td:first-child {
+  border-right: 2px solid rgb(127,127,127);
+}
+.instrumentation-table th {
+  text-align: center;
+}
+.instrumentation-table th.left {
+  text-align: left;
+}
+.instrumentation-table th.right {
+  text-align: right;
+}
+.instrumentation-table th,
+.instrumentation-table td {
+  white-space: pre-wrap;
+}
+.instrumentation-table tr th:first-child,
+.instrumentation-table tr td:first-child {
+  padding-left: 1.5rem;
+  width: 30%;
+}
+.instrumentation-table th:not(:first-child),
+.instrumentation-table td:not(:first-child) {
+  width: 5.833333333333%;
+}
+.instrumentation-table tbody tr:nth-child(odd) {
+  background-color: rgba(0, 0, 0, 0.4);
+}
+.instrumentation-table tbody td:nth-child(even) {
+  text-align: right;
+  border-right: 1px dashed;
+  padding-right: .5em;
+}
+.instrumentation-table tbody td:nth-child(odd) {
+  text-align: left;
+  padding-left: .5em;
+}
+.instrumentation-table tbody td:first-child {
+  padding-left: 1.5rem;
+}
+.instrumentation-table tfoot td {
+  line-height: 1rem;
+  text-align: center;
+  padding: 1.5rem 0;
+}
+.instrumentation-table small {
+  font-size: 1em;
+  opacity: .5;
+}
