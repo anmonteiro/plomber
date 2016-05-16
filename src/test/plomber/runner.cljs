@@ -1,4 +1,4 @@
-(ns plomber.run-tests
+(ns plomber.runner
   (:require [cljs.test :refer-macros [run-tests]]
             [cljs.nodejs]
             [plomber.tests]))

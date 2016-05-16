@@ -2,7 +2,7 @@
 
 (b/build (b/inputs "src/main" "src/test")
   {:target :nodejs
-   :main 'plomber.run-tests
+   :main 'plomber.runner
    :output-to "target/test/test.js"
    :output-dir "target/test/out"
    :parallel-build true

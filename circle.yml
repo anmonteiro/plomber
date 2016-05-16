@@ -1,0 +1,11 @@
+machine:
+  java:
+    version: oraclejdk8
+
+dependencies:
+  override:
+    - lein with-profiles -dev,+test deps
+
+test:
+  override:
+    - make test
