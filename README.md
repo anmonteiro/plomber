@@ -1,4 +1,4 @@
-# Plomber
+# Plomber [![CircleCI](https://circleci.com/gh/anmonteiro/plomber.svg?style=svg&circle-token=c36d14af28ad66d21060d4fbdc520151b0b027d7)](https://circleci.com/gh/anmonteiro/plomber)
 
 Component instrumentation for Om Next.
 
