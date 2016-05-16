@@ -4,7 +4,6 @@ test:
   # stupid react-dom asking for react
 	npm install react
 	lein with-profile -dev,+test doo node test once
-	node target/test/test.js
 
 clean:
 	rm -rf node_modules
