@@ -12,3 +12,6 @@ pom.xml.asc
 .nrepl-port
 
 node_modules/
+/resources/public/devcards/out/
+/resources/public/devcards/main.js
+figwheel*
