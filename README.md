@@ -4,6 +4,15 @@ Component instrumentation for Om Next.
 
 ![](https://cloud.githubusercontent.com/assets/661909/15430238/bb54dc40-1ea4-11e6-81b8-239969d3dc18.gif)
 
+## Contents
+
+- [Installation](#installation)
+- [Guide](#guide)
+  - [Getting started](#getting-started)
+  - [Instrumenting an Om Next application](#instrumenting-an-om-next-application)
+  - [Customization & Extras](#customization--extras)
+- [Copyright & License](#copyright--license)
+
 ## Installation
 
 - Requires currently unreleased Om
