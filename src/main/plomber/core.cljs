@@ -145,7 +145,9 @@
 
 (defn- compute-label [base-label sort? sort-asc?]
   (cond-> base-label
-    sort? (str (if sort-asc? " ⇧" " ⇩"))))
+    sort? (str (if sort-asc?
+                 (gstr/unescapeEntities " &#8679;")
+                 (gstr/unescapeEntities " &#8681;")))))
 
 (defn- handle-th-click [c sort-k e]
   (let [state (om/app-state (om/get-reconciler c))
@@ -156,10 +158,30 @@
                     (not sort-asc?)
                     true)})))
 
-(defn- stats-table-header [c label key]
-  (dom/th #js {:colSpan 2
-               :onClick #(handle-th-click c key %)}
+(defn- stats-table-header
+  [c label key props]
+  (dom/th props
     (dom/span nil label)))
+
+(defn- render-table-headers [c]
+  (let [{:keys [sort-key sort-asc?] :as props} (om/props c)]
+    (dom/tr nil
+      (map (fn [[label sort-k props]]
+             (let [props (if props
+                           props
+                           #js {:colSpan 2
+                                :key label
+                                :onClick #(handle-th-click c sort-k %)})]
+               (stats-table-header c label sort-k props)))
+        [[(compute-label "Component"
+            (keyword-identical? sort-key :component-name) sort-asc?) :component-name
+          #js {:key "component-name" :onClick #(handle-th-click c :component-name %)}]
+         [(compute-label "#" (.endsWith (name sort-key) "count") sort-asc?) :render-count]
+         [(compute-label "Last" (.startsWith (name sort-key) "last") sort-asc?) :last-render-ms]
+         [(compute-label "Average" (.startsWith (name sort-key) "avg") sort-asc?) :avg-render-ms]
+         [(compute-label "Worst" (.startsWith (name sort-key) "max") sort-asc?) :max-render-ms]
+         [(compute-label "Best" (.startsWith (name sort-key) "min") sort-asc?) :min-render-ms]
+         [(compute-label "Std. deviation" (.endsWith (name sort-key) "std-dev") sort-asc?) :render-std-dev]]))))
 
 (defui Statistics
   Object
@@ -171,11 +193,9 @@
       (kbd/register-key-handler this
         {toggle-shortcut #(om/update-state! this update-in [:visible?] not)})))
   (componentWillUnmount [this]
-    (println "unmounting sup")
     (kbd/dispose-key-handler this))
   (render [this]
-    (let [{:keys [sort-key sort-asc?] :as props} (om/props this)
-          stats (generate-stats props)
+    (let [stats (generate-stats (om/props this))
           {:keys [visible?]} (om/get-state this)]
       (dom/figure nil
         (dom/table #js {:className "instrumentation-table"
@@ -185,19 +205,7 @@
               (dom/td nil)
               (dom/th #js {:colSpan 12
                            :className "number"} "Render | Mount"))
-            (dom/tr nil
-              (dom/th #js {:onClick #(handle-th-click this :component-name %)}
-                (dom/span nil
-                  (compute-label "Component"
-                    (keyword-identical? sort-key :component-name) sort-asc?)))
-              (map (fn [[label sort-k]]
-                     (stats-table-header this label sort-k))
-                [[(compute-label "#" (.endsWith (name sort-key) "count") sort-asc?) :render-count]
-                 [(compute-label "Last" (.startsWith (name sort-key) "last") sort-asc?) :last-render-ms]
-                 [(compute-label "Average" (.startsWith (name sort-key) "avg") sort-asc?) :avg-render-ms]
-                 [(compute-label "Worst" (.startsWith (name sort-key) "max") sort-asc?) :max-render-ms]
-                 [(compute-label "Best" (.startsWith (name sort-key) "min") sort-asc?) :min-render-ms]
-                 [(compute-label "Std. deviation" (.endsWith (name sort-key) "std-dev") sort-asc?) :render-std-dev]])))
+            (render-table-headers this))
           (dom/tbody nil
             (map-indexed #(stats-row (assoc %2 :react-key %1)) stats))
           (dom/tfoot nil
