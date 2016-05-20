@@ -8,7 +8,8 @@
                  [figwheel-sidecar "0.5.3-1" :scope "test"]
                  [devcards-om-next "0.1.1" :scope "test"]]
 
-  :profiles {:dev {:dependencies [[org.omcljs/om "1.0.0-alpha35-SNAPSHOT" :scope "provided"]]}
+  :profiles {:dev {:dependencies [[org.omcljs/om "1.0.0-alpha35-SNAPSHOT" :scope "provided"]
+                                  [com.cemerick/piggieback "0.2.1"]]}
              :test {:dependencies [[org.omcljs/om "1.0.0-alpha35"]]
                     :plugins [[lein-doo "0.1.6"]
                               [lein-cljsbuild "1.1.3"]]
