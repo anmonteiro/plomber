@@ -2,16 +2,22 @@
 
 Component instrumentation for Om Next.
 
+![](https://cloud.githubusercontent.com/assets/661909/15430238/bb54dc40-1ea4-11e6-81b8-239969d3dc18.gif)
+
 ## Installation
 
 - Requires currently unreleased Om
-- keyboard shortcut code adapted from [PrecursorApp/om-i](https://github.com/PrecursorApp/om-i)
 
 ## Usage
 
 
-## License
+
+## Copyright & License
 
 Copyright © 2016 António Nuno Monteiro
 
 Distributed under the Eclipse Public License either version 1.0.
+
+Contains code adapted from the following projects:
+
+- [PrecursorApp/om-i](https://github.com/PrecursorApp/om-i)
