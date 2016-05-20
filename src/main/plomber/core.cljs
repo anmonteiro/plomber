@@ -246,7 +246,7 @@
   ([] (make-reconciler {}))
   ([keymap]
    (let [keymap (merge {:toggle-shortcut #{"ctrl" "shift" "s"}
-                        :clear-shortcut #{"ctrl" "shift" "c"}}
+                        :clear-shortcut #{"ctrl" "shift" "k"}}
                        keymap)]
      (om/reconciler {:state (atom initial-state)
                      :shared keymap}))))

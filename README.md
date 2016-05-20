@@ -8,9 +8,54 @@ Component instrumentation for Om Next.
 
 - Requires currently unreleased Om
 
-## Usage
+## Guide
+
+Plomber is heavily inspired by [PrecursorApp/om-i](https://github.com/PrecursorApp/om-i), and makes possible to identify which components in your Om Next application are rendering unnecessarily. It lists statistics pertaining to the mounting / rendering behavior of the components in your application, such as, but not limited to, the time it took to last render a component, its best / worst performing render, etc.
+
+### Getting started
+
+To get started, require Plomber where you declare the Om Next reconciler in your application.
+
+```clojure
+(ns my-app.core
+  (:require [plomber.core :as plomber]
+            [om.next :as om]))
+```
+
+### Instrumenting an Om Next application
+
+Setting up instrumentation for your Om Next application is easy with Plomber. Simply add an `:instrument` key to your Om Next reconciler as shown below.
+
+```clojure
+(def reconciler
+  (om/reconciler {:state ...
+                  :parser ...
+                  ;; ADD THIS:
+                  :instrument (plomber/instrument)}))
+```
+
+To toggle the instrumentation panel, click <kbd>Ctrl+Shift+s</kbd>. You can clear the list by clicking <kbd>Ctrl+Shift+k</kbd>. Sorting the metrics by your favorite attribute is as easy as clicking the column heading for a given statistic.
+
+### Customization & Extras
+
+Plomber allows you to provide a map of options to the `plumber.core/instrument` function to customize its behavior. Currently, the following are supported:
+
+- `keymap` — a map which can contain the keywords `toggle-shortcut` and `clear-shortcut` with the corresponding keymaps as values. A full example is shown below;
+- `extra-fn` — an extra function that Plomber calls for each component it instruments. This is a function of 1 argument, which receives a map with keys `factory`, `class`, `props` and `children`, corresponding to the Om Next component's factory, class, props and children, respectively.
 
 
+Customization example:
+
+```clojure
+(def reconciler
+  (om/reconciler {:state ...
+                  :parser ...
+                  ;; change :toggle-shortcut to `Ctrl+Shift+t`
+                  :instrument (plomber/instrument
+                                {:keymap {:toggle-shortcut #{"ctrl" "shift" "t"}}
+                                 :extra-fn (fn [{:keys [class factory props children]}]
+                                             (println "instrumenting component" class))})}))
+```
 
 ## Copyright & License
 
