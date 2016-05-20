@@ -7,8 +7,7 @@
 (enable-console-print!)
 
 (defn instrument [{:keys [props children class factory]}]
-  ;(.log js/console "hi" (.-prototype class))
-  )
+  (println "extra function works"))
 
 (def init-data
   {:dashboard/posts
@@ -269,7 +268,8 @@
   (om/reconciler
     {:state  union-init-data
      :parser (om/parser {:read union-read :mutate mutate})
-     :instrument (plomber/instrument instrument)}))
+     :instrument (plomber/instrument {:extra-fn instrument
+                                      :keymap {:toggle-shortcut #{"shift" "ctrl" "a"}}})}))
 
 (defcard-om-next union
   Dashboard

@@ -1,12 +1,18 @@
 (ns plomber.core
   (:require-macros [plomber.core :refer [wrap-lifecycle-methods show-when]])
-  (:require [goog.dom :as gdom]
+  (:require [clojure.string :as str]
+            [goog.dom :as gdom]
             [goog.object :as gobj]
             [goog.string :as gstr]
             [goog.string.format]
             [om.next :as om :refer-macros [defui]]
             [om.dom :as dom]
             [plomber.keyboard :as kbd]))
+
+(def initial-state
+  {:measurements nil
+   :sort-key :component-name
+   :sort-asc? true})
 
 (defmulti update-stats
   (fn [_ {:keys [type]}]
@@ -143,6 +149,10 @@
 
 (def stats-row (om/factory StatsRow))
 
+(defn- clear-stats! [c]
+  (let [state (om/app-state (om/get-reconciler c))]
+    (swap! state merge initial-state)))
+
 (defn- compute-label [base-label sort? sort-asc?]
   (cond-> base-label
     sort? (str (if sort-asc?
@@ -183,20 +193,35 @@
          [(compute-label "Best" (.startsWith (name sort-key) "min") sort-asc?) :min-render-ms]
          [(compute-label "Std. deviation" (.endsWith (name sort-key) "std-dev") sort-asc?) :render-std-dev]]))))
 
+(defn format-shortcut [key-set]
+  (str/join "+" (sort-by (comp - count) key-set)))
+
+(def key->label
+  {:component-name "component name"
+   :render-count "number of renders"
+   :last-render-ms "last render time"
+   :avg-render-ms "average render time"
+   :max-render-ms "worst render time"
+   :min-render-ms "best render time"
+   :render-std-dev "render standard deviation"})
+
 (defui Statistics
   Object
   (initLocalState [this]
     {:visible? false})
   (componentDidMount [this]
-    (let [{:keys [toggle-shortcut]} (om/shared this)
+    (let [{:keys [toggle-shortcut clear-shortcut]} (om/shared this)
           {:keys [visible?]} (om/get-state this)]
       (kbd/register-key-handler this
-        {toggle-shortcut #(om/update-state! this update-in [:visible?] not)})))
+        {toggle-shortcut #(om/update-state! this update-in [:visible?] not)
+         clear-shortcut  #(clear-stats! this)})))
   (componentWillUnmount [this]
     (kbd/dispose-key-handler this))
   (render [this]
-    (let [stats (generate-stats (om/props this))
-          {:keys [visible?]} (om/get-state this)]
+    (let [{:keys [sort-key sort-asc?] :as props} (om/props this)
+          stats (generate-stats props)
+          {:keys [visible?]} (om/get-state this)
+          {:keys [toggle-shortcut clear-shortcut]} (om/shared this)]
       (dom/figure nil
         (dom/table #js {:className "instrumentation-table"
                         :style #js {:display (if visible? "table" "none")}}
@@ -211,17 +236,20 @@
           (dom/tfoot nil
             (dom/tr nil
               (dom/td #js {:className "instrumentation-info" :colSpan "13"}
-                #_(gstring/format "Component render stats, sorted by %s (%s). Clicks go through. %s to toggle, %s to clear."
-                    sort-order
-                    (format-shortcut sort-shortcut)
-                    (format-shortcut toggle-shortcut)
-                    (format-shortcut clear-shortcut))))))))))
+                (gstr/format "Component stats sorted by %s, %s. %s to toggle, %s to clear."
+                  (key->label sort-key)
+                  (if sort-asc? "ascending" "descending")
+                  (format-shortcut toggle-shortcut)
+                  (format-shortcut clear-shortcut))))))))))
 
-(defonce reconciler
-  (om/reconciler {:state (atom {:measurements nil
-                                :sort-key :component-name
-                                :sort-asc? true})
-                  :shared {:toggle-shortcut #{"shift" "meta" "s"}}}))
+(defn make-reconciler
+  ([] (make-reconciler {}))
+  ([keymap]
+   (let [keymap (merge {:toggle-shortcut #{"ctrl" "shift" "s"}
+                        :clear-shortcut #{"ctrl" "shift" "c"}}
+                       keymap)]
+     (om/reconciler {:state (atom initial-state)
+                     :shared keymap}))))
 
 (defn prepend-stats-node [classname]
   (let [node (gdom/htmlToDocumentFragment (gstr/format "<div class='%s'></div>" classname))
@@ -230,17 +258,14 @@
     node))
 
 (defn instrument
-  ([] (instrument (constantly nil)))
-  ([f]
+  ([] (instrument {}))
+  ([{:keys [extra-fn keymap] :or {extra-fn (constantly nil)}}]
    (let [class "plomber"
          node  (or (gdom/getElementByClass class)
-                   (prepend-stats-node class))]
+                   (prepend-stats-node class))
+         reconciler (make-reconciler keymap)]
      (om/add-root! reconciler Statistics node)
      (fn [{:keys [props children class factory] :as m}]
-       (f m)
+       (extra-fn m)
        (wrap-lifecycle-methods (om/app-state reconciler) class)
        (apply factory props children)))))
-
-;; TODO:
-;; - key bindings
-;; - 
