@@ -3,8 +3,11 @@ machine:
     version: oraclejdk8
 
 dependencies:
+  pre:
+    - wget https://github.com/boot-clj/boot-bin/releases/download/latest/boot.sh
+    - mv boot.sh boot && chmod a+x boot && sudo mv boot /usr/local/bin
   override:
-    - lein with-profiles -dev,+test deps
+    - boot deps
 
 test:
   override:
