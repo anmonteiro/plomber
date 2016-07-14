@@ -1,0 +1,12 @@
+#!/bin/bash
+
+set -e
+set -o xtrace
+
+# https://twitter.com/gavinjoyce/status/691773956144119808
+npm set progress=false
+# stupid react-dom asking for react
+npm install react
+boot test-cljs
+pushd target
+node output.js

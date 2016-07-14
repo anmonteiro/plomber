@@ -1,0 +1,3 @@
+{:require [plomber.devcards.core]
+ :init-fns [plomber.devcards.core/init!]
+ :compiler-options {:asset-path "js/devcards.out"}}

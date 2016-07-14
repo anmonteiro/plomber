@@ -1,10 +1,14 @@
 (ns plomber.devcards.core
-  (:require [devcards-om-next.core :refer-macros [defcard-om-next om-next-root]]
+  (:require [devcards.core :as dc :include-macros true]
+            [devcards-om-next.core :refer-macros [defcard-om-next om-next-root]]
             [plomber.core :as plomber]
             [om.next :as om :refer-macros [defui]]
             [om.dom :as dom]))
 
 (enable-console-print!)
+
+(defn init! []
+  (dc/start-devcard-ui!))
 
 (defn instrument [{:keys [props children class factory]}]
   (println "extra function works"))
