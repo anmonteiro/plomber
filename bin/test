@@ -3,6 +3,7 @@
 set -e
 set -o xtrace
 
+make clean
 # https://twitter.com/gavinjoyce/status/691773956144119808
 npm set progress=false
 # stupid react-dom asking for react
