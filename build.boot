@@ -3,11 +3,11 @@
 (set-env!
  :source-paths    #{"src/main"}
  :resource-paths  #{"resources"}
- :dependencies '[[org.clojure/clojurescript   "1.8.51"         :scope "provided"]
+ :dependencies '[[org.clojure/clojurescript   "1.9.89"         :scope "provided"]
                  [org.omcljs/om               "1.0.0-alpha40"  :scope "provided"]
                  [com.cognitect/transit-clj   "0.8.285"        :scope "test"]
                  [devcards                    "0.2.1-7"        :scope "test"]
-                 [devcards-om-next            "0.1.1"          :scope "test"]
+                 [devcards-om-next            "0.2.0"          :scope "test"]
                  [doo                         "0.1.7"          :scope "test"]
                  [com.cemerick/piggieback     "0.2.1"          :scope "test"]
                  [pandeiro/boot-http          "0.7.3"          :scope "test"]
