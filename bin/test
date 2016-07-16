@@ -8,6 +8,6 @@ make clean
 npm set progress=false
 # stupid react-dom asking for react
 npm install react
-boot test-cljs
+boot test
 pushd target
 node output.js

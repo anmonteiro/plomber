@@ -62,15 +62,10 @@
   (set-env! :source-paths #(conj % "src/test"))
   identity)
 
-(deftask test-cljs
-  [e exit?     bool  "Enable flag."]
-  (let [exit? (cond-> exit?
-                (nil? exit?) not)
-        suite-ns 'plomber.run-tests
-        cljs-opts (merge {:main suite-ns
-                          :optimizations :none
-                          :target :nodejs
-                          :parallel-build true})]
+(ns-unmap *ns* 'test)
+
+(deftask test []
+  (let [suite-ns 'plomber.run-tests]
     (comp
       (testing)
       (prep-cljs-tests
@@ -78,5 +73,8 @@
         :suite-ns suite-ns
         :out-file "output.js")
       (cljs :ids #{"output"}
-        :compiler-options cljs-opts)
+        :compiler-options {:main suite-ns
+                           :optimizations :none
+                           :target :nodejs
+                           :parallel-build true})
       (target))))
