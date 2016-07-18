@@ -8,7 +8,6 @@
                  [com.cognitect/transit-clj   "0.8.285"        :scope "test"]
                  [devcards                    "0.2.1-7"        :scope "test"]
                  [devcards-om-next            "0.2.0"          :scope "test"]
-                 [doo                         "0.1.7"          :scope "test"]
                  [com.cemerick/piggieback     "0.2.1"          :scope "test"]
                  [pandeiro/boot-http          "0.7.3"          :scope "test"]
                  [adzerk/boot-cljs            "1.7.228-1"      :scope "test"]
@@ -17,19 +16,16 @@
                  [adzerk/boot-reload          "0.4.11"         :scope "test"]
                  [adzerk/bootlaces            "0.1.13"         :scope "test"]
                  [org.clojure/tools.nrepl     "0.2.12"         :scope "test"]
-                 [org.clojure/tools.namespace "0.3.0-alpha3"   :scope "test"]
                  [weasel                      "0.7.0"          :scope "test"]])
 
 (require
  '[adzerk.boot-cljs      :refer [cljs]]
- '[adzerk.boot-cljs-repl :as cr :refer [cljs-repl-env start-repl]]
+ '[adzerk.boot-cljs-repl :refer [cljs-repl-env start-repl]]
  '[adzerk.boot-reload    :refer [reload]]
  '[adzerk.bootlaces      :refer [bootlaces! push-release]]
- '[clojure.tools.namespace.repl :as repl]
- '[crisptrutski.boot-cljs-test :refer [prep-cljs-tests]]
+ '[crisptrutski.boot-cljs-test :refer [test-cljs]]
  '[pandeiro.boot-http :refer [serve]]
- '[clojure.java.io :as io]
- '[doo.core :as doo])
+ '[clojure.java.io :as io])
 
 (bootlaces! +version+ :dont-modify-paths? true)
 
@@ -62,19 +58,24 @@
   (set-env! :source-paths #(conj % "src/test"))
   identity)
 
+(deftask add-node-modules []
+  (with-pre-wrap fileset
+    (let [nm (io/file "node_modules")]
+      (when-not (and (.exists nm) (.isDirectory nm))
+        (dosh "npm" "install" "react"))
+      (-> fileset
+        (add-resource (io/file ".") :include #{#"^node_modules/"})
+        commit!))))
+
 (ns-unmap *ns* 'test)
 
 (deftask test []
-  (let [suite-ns 'plomber.run-tests]
-    (comp
-      (testing)
-      (prep-cljs-tests
-        :namespaces #{'plomber.tests}
-        :suite-ns suite-ns
-        :out-file "output.js")
-      (cljs :ids #{"output"}
-        :compiler-options {:main suite-ns
-                           :optimizations :none
-                           :target :nodejs
-                           :parallel-build true})
-      (target))))
+  (comp
+    (testing)
+    (add-node-modules)
+    (test-cljs
+      :namespaces #{'plomber.tests}
+      :suite-ns 'plomber.run-tests
+      :out-file "output.js"
+      :js-env :node
+      :cljs-opts {:parallel-build true})))
