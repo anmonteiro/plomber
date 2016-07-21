@@ -251,8 +251,13 @@
      (om/reconciler {:state (atom initial-state)
                      :shared keymap}))))
 
+(defn stats-node [stats]
+  (if (exists? gdom/constHtmlToNode)
+    (gdom/constHtmlToNode (.from gstr/Const stats))
+    (gdom/htmlToDocumentFragment stats)))
+
 (defn prepend-stats-node [classname]
-  (let [node (gdom/htmlToDocumentFragment (gstr/format "<div class='%s'></div>" classname))
+  (let [node (stats-node (gstr/format "<div class='%s'></div>" classname))
         body js/document.body]
     (.insertBefore body node (.-firstChild body))
     node))
