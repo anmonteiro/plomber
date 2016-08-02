@@ -9,12 +9,12 @@
             [om.dom :as dom]
             [plomber.keyboard :as kbd]))
 
-(def initial-state
+(def ^:private initial-state
   {:measurements nil
    :sort-key :component-name
    :sort-asc? true})
 
-(defmulti update-stats
+(defmulti ^:private update-stats
   (fn [_ {:keys [type]}]
     type))
 
@@ -41,10 +41,10 @@
         (update-in [:render-ts] (fnil conj [])
           (max (- when (get stats :will-update when)) 0))))))
 
-(defn display-name [c]
+(defn- display-name [c]
   (.. c -constructor -displayName))
 
-(defn wrap-componentWillMount [state f]
+(defn- wrap-componentWillMount [state f]
   (fn [next-props next-state]
     (this-as this
       (update-stats state {:type :will-mount
@@ -52,7 +52,7 @@
                            :when (system-time)})
       (.call f this))))
 
-(defn wrap-componentDidMount [state f]
+(defn- wrap-componentDidMount [state f]
   (fn [next-props next-state]
     (this-as this
       (update-stats state {:type :did-mount
@@ -61,7 +61,7 @@
       (when f
         (.call f this)))))
 
-(defn wrap-componentWillUpdate [state f]
+(defn- wrap-componentWillUpdate [state f]
   (fn [next-props next-state]
     (this-as this
       (update-stats state {:type :will-update
@@ -69,7 +69,7 @@
                            :when (system-time)})
       (.call f this next-props next-state))))
 
-(defn wrap-componentDidUpdate [state f]
+(defn- wrap-componentDidUpdate [state f]
   (fn [next-props next-state]
     (this-as this
       (update-stats state {:type :did-update
@@ -77,15 +77,15 @@
                            :when (system-time)})
       (.call f this next-props next-state))))
 
-(defn avg [coll]
+(defn- avg [coll]
   (/ (reduce + coll)
     (count coll)))
 
-(defn std-dev [coll]
+(defn- std-dev [coll]
   (let [a (avg coll)]
     (Math/sqrt (avg (map #(Math/pow (- % a) 2) coll)))))
 
-(defn generate-stats [{:keys [measurements sort-key sort-asc?]}]
+(defn- generate-stats [{:keys [measurements sort-key sort-asc?]}]
   (let [stats (reduce
                 (fn [ret [name samples]]
                   (let [{:keys [mount-ts render-ts]} samples
@@ -110,7 +110,7 @@
       (and sort?
            (not sort-asc?)) reverse)))
 
-(defui StatsRow
+(defui ^:once StatsRow
   Object
   (shouldComponentUpdate [this next-props _]
     (let [{render-count' :render-count
@@ -147,7 +147,7 @@
         (dom/td #js {:className "number"} (show-when render-std-dev format-%))
         (dom/td #js {:className "number"} (show-when mount-std-dev format-%))))))
 
-(def stats-row (om/factory StatsRow))
+(def ^:private stats-row (om/factory StatsRow))
 
 (defn- clear-stats! [c]
   (let [state (om/app-state (om/get-reconciler c))]
@@ -193,10 +193,10 @@
          [(compute-label "Best" (.startsWith (name sort-key) "min") sort-asc?) :min-render-ms]
          [(compute-label "Std. deviation" (.endsWith (name sort-key) "std-dev") sort-asc?) :render-std-dev]]))))
 
-(defn format-shortcut [key-set]
+(defn- format-shortcut [key-set]
   (str/join "+" (sort-by (comp - count) key-set)))
 
-(def key->label
+(def ^:private key->label
   {:component-name "component name"
    :render-count "number of renders"
    :last-render-ms "last render time"
@@ -205,7 +205,7 @@
    :min-render-ms "best render time"
    :render-std-dev "render standard deviation"})
 
-(defui Statistics
+(defui ^:once Statistics
   Object
   (initLocalState [this]
     {:visible? false})
@@ -242,7 +242,7 @@
                   (format-shortcut toggle-shortcut)
                   (format-shortcut clear-shortcut))))))))))
 
-(defn make-reconciler
+(defn- make-reconciler
   ([] (make-reconciler {}))
   ([keymap]
    (let [keymap (merge {:toggle-shortcut #{"ctrl" "shift" "s"}
@@ -251,12 +251,12 @@
      (om/reconciler {:state (atom initial-state)
                      :shared keymap}))))
 
-(defn stats-node [stats]
+(defn- stats-node [stats]
   (if (exists? gdom/constHtmlToNode)
     (gdom/constHtmlToNode (.from gstr/Const stats))
     (gdom/htmlToDocumentFragment stats)))
 
-(defn prepend-stats-node [classname]
+(defn- prepend-stats-node [classname]
   (let [node (stats-node (gstr/format "<div class='%s'></div>" classname))
         body js/document.body]
     (.insertBefore body node (.-firstChild body))
