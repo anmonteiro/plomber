@@ -4,16 +4,16 @@
  :source-paths    #{"src/main"}
  :resource-paths  #{"resources"}
  :dependencies '[[org.clojure/clojurescript   "1.9.89"         :scope "provided"]
-                 [org.omcljs/om               "1.0.0-alpha40"  :scope "provided"]
-                 [com.cognitect/transit-clj   "0.8.285"        :scope "test"]
+                 [org.omcljs/om               "1.0.0-alpha41"  :scope "provided"]
+                 [com.cognitect/transit-clj   "0.8.288"        :scope "test"]
                  [devcards                    "0.2.1-7"        :scope "test"]
-                 [devcards-om-next            "0.2.0"          :scope "test"]
+                 [devcards-om-next            "0.3.0"          :scope "test"]
                  [com.cemerick/piggieback     "0.2.1"          :scope "test"]
                  [pandeiro/boot-http          "0.7.3"          :scope "test"]
                  [adzerk/boot-cljs            "1.7.228-1"      :scope "test"]
-                 [adzerk/boot-cljs-repl       "0.3.2"          :scope "test"]
+                 [adzerk/boot-cljs-repl       "0.3.3"          :scope "test"]
                  [crisptrutski/boot-cljs-test "0.2.2-SNAPSHOT" :scope "test"]
-                 [adzerk/boot-reload          "0.4.11"         :scope "test"]
+                 [adzerk/boot-reload          "0.4.12"         :scope "test"]
                  [adzerk/bootlaces            "0.1.13"         :scope "test"]
                  [org.clojure/tools.nrepl     "0.2.12"         :scope "test"]
                  [weasel                      "0.7.0"          :scope "test"]])
