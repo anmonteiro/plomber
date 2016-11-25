@@ -15,7 +15,9 @@ Component instrumentation for Om Next.
 
 ## Installation
 
-- Requires currently unreleased Om
+- Requires at least Om 1.0.0-alpha40
+
+Not deployed. Let me know if you want to use it.
 
 ## Guide
 
