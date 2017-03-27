@@ -17,7 +17,21 @@ Component instrumentation for Om Next.
 
 - Requires at least Om 1.0.0-alpha40
 
-Not deployed. Let me know if you want to use it.
+Leiningen dependency information:
+
+```clojure
+[plomber "0.1.0"]
+```
+
+Maven dependency information:
+
+```xml
+<dependency>
+  <groupId>plomber</groupId>
+  <artifactId>plomber</artifactId>
+  <version>0.1.0</version>
+</dependency>
+```
 
 ## Guide
 
