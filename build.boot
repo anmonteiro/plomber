@@ -3,7 +3,8 @@
 (set-env!
  :source-paths    #{"src/main"}
  :resource-paths  #{"resources"}
- :dependencies '[[org.clojure/clojurescript   "1.9.89"         :scope "provided"]
+ :dependencies '[[org.clojure/clojure         "1.9.0-alpha15"  :scope "provided"]
+                 [org.clojure/clojurescript   "1.9.89"         :scope "provided"]
                  [org.omcljs/om               "1.0.0-alpha41"  :scope "provided"]
                  [com.cognitect/transit-clj   "0.8.288"        :scope "test"]
                  [devcards                    "0.2.1-7"        :scope "test"]
@@ -37,6 +38,15 @@
        :scm {:url "https://github.com/anmonteiro/plomber"}
        :license {"name" "Eclipse Public License"
                  "url"  "http://www.eclipse.org/legal/epl-v10.html"}})
+
+(deftask build-jar []
+  (set-env! :resource-paths #{"src/main"})
+  (adzerk.bootlaces/build-jar))
+
+(deftask release-clojars! []
+  (comp
+    (build-jar)
+    (push-release)))
 
 (deftask deps [])
 
