@@ -115,3 +115,73 @@
   font-size: 1em;
   opacity: .5;
 }
+
+.parser-table {
+  -webkit-animation: in-fade-top-soft 500ms;
+  animation: in-fade-top-soft 500ms;
+  background-color: rgba(0, 0, 0, 0.6);
+  font-family: Monaco, monospace;
+  font-size: .75rem;
+  line-height: 2;
+  width: 100%;
+  border-collapse: collapse;
+}
+.parser-table thead,
+.parser-table tr {
+  border-color: none;
+}
+.parser-table th {
+  color: #ffffff;
+  line-height: 1rem;
+  padding: 0.6rem 0;
+/*  text-transform: uppercase;*/
+  text-align: left;
+  border-bottom: 2px solid rgb(127,127,127);
+}
+.parser-table tr:not(:first-child) th {
+  pointer-events: auto;
+  cursor: pointer;
+  padding: 0.8rem 0;
+}
+.parser-table tr:not(:first-child) th:hover span {
+  background-color: rgb(127,127,127);
+  padding: 5px;
+  border-radius: 5px;
+}
+.parser-table tr:not(:first-child) th:first-child,
+.parser-table thead td:first-child {
+  border-right: 2px solid rgb(127,127,127);
+}
+.parser-table th {
+  text-align: center;
+}
+
+.parser-table th,
+.parser-table td {
+  white-space: pre-wrap;
+  text-align: center;
+}
+.parser-table tr th:first-child,
+.parser-table tr td:first-child {
+  padding-left: 1.5rem;
+  width: 20%;
+}
+.parser-table th:not(:first-child),
+.parser-table td:not(:first-child) {
+  width: 5.833333333333%;
+}
+.parser-table tbody tr:nth-child(odd) {
+  background-color: rgba(0, 0, 0, 0.4);
+}
+.parser-table tbody td:first-child {
+  padding-left: 1.5rem;
+}
+.parser-table tfoot td {
+  line-height: 1rem;
+  text-align: center;
+  padding: 1.5rem 0;
+}
+.parser-table small {
+  font-size: 1em;
+  opacity: .5;
+}
