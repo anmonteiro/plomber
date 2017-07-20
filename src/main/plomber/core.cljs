@@ -113,7 +113,7 @@
            (not sort-asc?)) reverse)))
 
 (defn- generate-parser-stats
-  [{:keys [query mutate]}]
+  [{:keys [query mutate remote]}]
   (letfn [(stats [s]
             (reduce
              (fn [ret [dk samples]]
@@ -130,7 +130,11 @@
       (assoc :query (stats query))
 
       mutate
-      (assoc :mutate (stats mutate)))))
+      (assoc :mutate (stats mutate))
+
+      mutate
+      (assoc :remote (stats remote))
+      )))
 
 (def format-ms (partial gstr/format "%.2f ms"))
 (def format-% (partial gstr/format "%.2f %"))
@@ -229,8 +233,8 @@
    :min-render-ms "best render time"
    :render-std-dev "render standard deviation"})
 
-(defn- parser-stats-table
-  [label visible? stats sort-key sort-asc?]
+(defn- render-parser-stats-table
+  [this label visible? stats sort-key sort-asc?]
   (dom/table #js {:className "parser-table"
                   :style #js {:display (if visible? "table" "none")}}
     (dom/thead nil
@@ -239,7 +243,12 @@
       (dom/tr nil
         (map (fn [[label k]]
                (dom/th #js {:key label
-                            :onClick #(println "Clicked " label)} (compute-label label (keyword-identical? sort-key k) sort-asc?)))
+                            :onClick #(om/update-state! this (fn [s]
+                                                               (merge s {:sort-key k
+                                                                         :sort-asc? (if (keyword-identical? sort-key k)
+                                                                                      (not sort-asc?)
+                                                                                      true)})))}
+                 (dom/span nil (compute-label label (keyword-identical? sort-key k) sort-asc?))))
              [["Dispatch key" :dispatch-key]
               ["#" :count]
               ["Average" :avg-duration]
@@ -248,7 +257,7 @@
               ["Std. Dev." :std-dev-duration]])))
     (dom/tbody nil
                (map-indexed (fn [i item]
-                              (dom/tr nil
+                              (dom/tr #js {:key i}
                                 (dom/td nil
                                   (pr-str (:dispatch-key item)))
                                 (dom/td nil
@@ -262,6 +271,20 @@
                                 (dom/td nil
                                   (show-when (:std-dev-duration item) format-%)))) stats))))
 
+(defui ^:once ParserStatsTable
+  Object
+  (render [this]
+    (let [{:keys [label visible?]} (om/get-computed this)
+          {:keys [sort-key sort-asc?] :or {sort-asc? true sort-key :dispatch-key}} (om/get-state this)
+          stats (:stats (om/props this))
+          sort? (some sort-key stats)
+          sorted (cond->> stats
+                  sort? (sort-by sort-key)
+                  (and sort?
+                       (not sort-asc?)) reverse)]
+      (render-parser-stats-table this label visible? sorted sort-key sort-asc?))))
+
+(def parser-stats-table (om/factory ParserStatsTable))
 
 (defui ^:once Statistics
   Object
@@ -301,9 +324,14 @@
                   (format-shortcut toggle-shortcut)
                   (format-shortcut clear-shortcut))))))
         (when-let [qstats (:query pstats)]
-          (parser-stats-table "Queries" visible? qstats :dispatch-key true))
+          (parser-stats-table (om/computed {:stats qstats} {:label "Queries"
+                                                   :visible? visible?})))
         (when-let [mstats (:mutate pstats)]
-          (parser-stats-table "Mutates" visible? mstats :dispatch-key true))))))
+          (parser-stats-table (om/computed {:stats mstats} {:label "Mutates"
+                                                   :visible? visible?})))
+        (when-let [rstats (:remote pstats)]
+          (parser-stats-table (om/computed {:stats rstats} {:label "Remotes"
+                                                   :visible? visible?})))))))
 
 (defn make-reconciler
   ([] (make-reconciler {}))
@@ -356,6 +384,22 @@
                                                                                   :result r})
                                r)))
           r)))))
+
+(defn instrument-send
+  [send-fn {:keys [reconciler]}]
+  (let [state (om/app-state reconciler)]
+    (fn [remotes cb]
+      (let [st (system-time)
+            cb' (fn [r]
+                  (let [ks (into [] (keys r))
+                        et (system-time)]
+                    (swap! state update-in [:remote ks] (fnil conj []) {:dispatch-key ks
+                                                                        :when st
+                                                                        :duration (- et st)
+                                                                        :params remotes
+                                                                        :result r})
+                    (cb r)))]
+        (send-fn remotes cb')))))
 
 (defn instrument
   ([] (instrument {}))
