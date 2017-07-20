@@ -268,12 +268,15 @@
    (fn []
      (swap! state update-in (conj ref :favorites) inc))})
 
+(defonce plomber-reconciler (plomber/make-reconciler {:toggle-shortcut #{"shift" "ctrl" "a"}}))
+
 (def union-reconciler
   (om/reconciler
     {:state  union-init-data
-     :parser (om/parser {:read union-read :mutate mutate})
+     :parser (om/parser {:read (plomber/instrument-read union-read {:reconciler plomber-reconciler})
+                         :mutate (plomber/instrument-mutate mutate {:reconciler plomber-reconciler})})
      :instrument (plomber/instrument {:extra-fn instrument
-                                      :keymap {:toggle-shortcut #{"shift" "ctrl" "a"}}})}))
+                                      :reconciler plomber-reconciler})}))
 
 (defcard-om-next union
   Dashboard
