@@ -289,7 +289,7 @@
 (defui ^:once Statistics
   Object
   (initLocalState [this]
-    {:visible? true})
+    {:visible? false})
   (componentDidMount [this]
     (let [{:keys [toggle-shortcut clear-shortcut]} (om/shared this)
           {:keys [visible?]} (om/get-state this)]
